@@ -1,4 +1,4 @@
-# Complete and CORRECTED code for backend/app.py to handle CORS OPTIONS requests
+# Complete code for backend/app.py with updated run command for debugging
 
 import os
 import openai
@@ -8,7 +8,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 app = Flask(__name__)
-# This line is still important!
 CORS(app) 
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
@@ -109,4 +108,5 @@ Give each stack its own unique name and put a total value at the bottom of each 
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    # This line is changed for debugging on Render
+    app.run(host='0.0.0.0', port=10000)
