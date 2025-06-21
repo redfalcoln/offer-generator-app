@@ -33,7 +33,7 @@ const App = () => {
         setResult(''); // Clear previous result
 
         try {
-            const response = await fetch('https://my-offer-app-backend.onrender.com/api/generate-niche-titles', {
+            const response = await fetch('https://my-offer-app-042a813ec0e9.herokuapp.com/api/generate-niche-titles', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ niche_category: selectedNiche }),
