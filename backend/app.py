@@ -1,14 +1,19 @@
-# Complete code for backend/app.py with updated run command for debugging
+# FINAL ATTEMPT: Complete code for backend/app.py with robust CORS configuration
 
 import os
 import openai
 from flask import Flask, request, jsonify
-from flask_cors import CORS
+from flask_cors import CORS # We still need this import
 from dotenv import load_dotenv
 
 load_dotenv()
 app = Flask(__name__)
-CORS(app) 
+
+# --- ROBUST CORS CONFIGURATION ---
+# This is the key change. We are explicitly telling CORS to handle all /api/ routes
+# and allow all origins, which is standard for a public API.
+CORS(app, resources={r"/api/*": {"origins": "*"}})
+
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
 # --- HEALTH CHECK ENDPOINT ---
@@ -16,11 +21,11 @@ openai.api_key = os.getenv('OPENAI_API_KEY')
 def index():
     return "Backend server is running!"
 
+# --- We have removed the manual OPTIONS handling from all routes ---
+
 # --- STEP 1: NICHE GENERATOR ---
-@app.route('/api/generate-niche', methods=['POST', 'OPTIONS'])
+@app.route('/api/generate-niche', methods=['POST'])
 def generate_niche():
-    if request.method == 'OPTIONS':
-        return jsonify({'status': 'ok'}), 200
     data = request.json
     niche_category = data.get('niche_category')
     prompt = f"Create a list of niche titles in high-profit, high-demand markets following this framework: [WHAT] [JOINER] [WHO/WHERE]. Use 'for' or 'in' as the joiner, and consider using specific demographics or geographic markers (2 words max) that are well-suited to the \"{niche_category}\" niche. Display results in a numbered list with WHAT, WHO/WHERE in bold, and the JOINER in regular weight."
@@ -31,10 +36,8 @@ def generate_niche():
         return jsonify({'error': str(e)}), 500
 
 # --- STEP 3: OUTCOME GENERATOR ---
-@app.route('/api/generate-outcome', methods=['POST', 'OPTIONS'])
+@app.route('/api/generate-outcome', methods=['POST'])
 def generate_outcome():
-    if request.method == 'OPTIONS':
-        return jsonify({'status': 'ok'}), 200
     data = request.json
     industry = data.get('industry')
     niche_avatar = data.get('niche_avatar')
@@ -46,10 +49,8 @@ def generate_outcome():
         return jsonify({'error': str(e)}), 500
 
 # --- STEP 4: METHOD GENERATOR ---
-@app.route('/api/generate-method', methods=['POST', 'OPTIONS'])
+@app.route('/api/generate-method', methods=['POST'])
 def generate_method():
-    if request.method == 'OPTIONS':
-        return jsonify({'status': 'ok'}), 200
     data = request.json
     industry = data.get('industry')
     niche_avatar = data.get('niche_avatar')
@@ -62,10 +63,8 @@ def generate_method():
         return jsonify({'error': str(e)}), 500
 
 # --- STEP 6: OFFER STACK GENERATOR ---
-@app.route('/api/generate-stack', methods=['POST', 'OPTIONS'])
+@app.route('/api/generate-stack', methods=['POST'])
 def generate_stack():
-    if request.method == 'OPTIONS':
-        return jsonify({'status': 'ok'}), 200
     prompt = """With all this in mind, help me brainstorm a few 3-part-stacks for my offer. Choose a combination between these:
 
 🟢 App ($7/m - $50/m)
@@ -108,5 +107,4 @@ Give each stack its own unique name and put a total value at the bottom of each 
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    # This line is changed for debugging on Render
     app.run(host='0.0.0.0', port=10000)
