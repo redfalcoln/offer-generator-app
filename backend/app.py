@@ -1,4 +1,4 @@
-# Complete code for backend/app.py
+# Complete and CORRECTED code for backend/app.py
 
 import os
 import openai
@@ -85,7 +85,7 @@ def generate_stack():
 🔴 Seminar ($2,000 - $6,000)
 🔴 Retreat / Event / Experience ($2,000+)
 
-Choose 3 inclusions from the above list for each possible value stack, one from each colour group where the legend is 🟢 Do it yourself, 🟠 Done with you, 🔴 Done for you. (Note: I have corrected the prompt's color mapping for clarity, as the original had Done For You as Orange).
+Choose 3 inclusions from the above list for each possible value stack, one from each colour group where the legend is 🟢 Do it yourself, 🟠 Done with you, 🔴 Done for you.
 
 Format the final list with the relevant coloured emoji's still attached. Remove the price guide that I've included from the list, and add your own value (a fixed number representing the value of the inclusion). Include a brief 1 sentence example for each inclusion to stimulate ideas. 
 
@@ -96,3 +96,9 @@ Give each stack its own unique name and put a total value at the bottom of each 
     try:
         completion = openai.chat.completions.create(model="gpt-4", messages=[{"role": "user", "content": prompt}])
         return jsonify({'response': completion.choices[0].message.content})
+    # --- FIX: ADDED THE MISSING EXCEPTION BLOCK HERE ---
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True, port=5001)
