@@ -1,9 +1,8 @@
-// Complete code for frontend/src/App.js with all 12 niche options
+// FINAL code for frontend/src/App.js
 
 import React, { useState } from 'react';
 import './App.css';
 
-// This array now contains all 12 niche titles from your spreadsheet
 const nicheOptions = [
   "💵 Wealth > Making Money",
   "💵 Wealth > Growing money",
@@ -20,7 +19,6 @@ const nicheOptions = [
 ];
 
 const App = () => {
-    // State to hold the user's dropdown selection, the result, and loading status
     const [selectedNiche, setSelectedNiche] = useState(nicheOptions[0]);
     const [result, setResult] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -30,10 +28,11 @@ const App = () => {
         e.preventDefault();
         setIsLoading(true);
         setError('');
-        setResult(''); // Clear previous result
+        setResult('');
 
         try {
-            const response = await fetch('https://my-offer-app-042a813ec0e9.herokuapp.com/api/generate-niche-titles', {
+            // This is the new, simplified URL.
+            const response = await fetch('/.netlify/functions/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ niche_category: selectedNiche }),
@@ -54,7 +53,6 @@ const App = () => {
         <div className="App">
             <div className="container">
                 <h1>Create Your Offer</h1>
-                
                 <div className="step-container">
                   <h2>Step 1: Niche</h2>
                   <form onSubmit={handleSubmit}>
@@ -69,8 +67,6 @@ const App = () => {
                       </button>
                   </form>
                 </div>
-
-                {/* This section will display the result under the "Step 2" heading as requested */}
                 <div className="step-container">
                     <h2>Step 2: Avatar</h2>
                     <p>The AI-generated Niche Titles will appear below. You can then define your Avatar based on these ideas.</p>

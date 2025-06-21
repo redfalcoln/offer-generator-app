@@ -1,0 +1,15 @@
+# General
+.DS_Store
+
+# Python / Backend specific files
+# This ensures the .env file inside the backend folder is ignored
+backend/.env
+backend/venv/
+__pycache__/
+
+# Node / Frontend specific files
+frontend/node_modules/
+frontend/build/
+
+# Netlify specific
+.netlify/
