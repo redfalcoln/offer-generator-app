@@ -1,6 +1,10 @@
+# The final, correct Netlify configuration
 [build]
-  command = "npm run build"
+  # Tell Netlify to run the build command FROM the frontend folder
+  command = "npm --prefix frontend run build"
+  # The final published site is located at frontend/build
   publish = "frontend/build"
 
 [functions]
-  directory = "netlify/functions/"
+  # The serverless functions are located at netlify/functions
+  directory = "netlify/functions"
