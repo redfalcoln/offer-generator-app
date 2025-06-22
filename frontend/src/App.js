@@ -32,7 +32,7 @@ const App = () => {
 
         try {
             // This is the new, simplified URL.
-            const response = await fetch('https://coral-app-rbtwz.ondigitalocean.app/offer-generator-app-frontend/api/generate-niche-titles', {
+            const response = await fetch('https://coral-app-rbtwz.ondigitalocean.app/api/generate-niche-titles', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ niche_category: selectedNiche }),
