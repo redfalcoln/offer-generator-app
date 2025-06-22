@@ -1,4 +1,4 @@
-# The final and correct Netlify configuration for a monorepo
+# The final, definitive configuration for Netlify
 
 # This section tells Netlify how to build your React frontend
 [build]
@@ -10,6 +10,7 @@
   publish = "build"
 
 # This section tells Netlify where to find your serverless functions
-# This path is always relative to the root of your project.
 [functions]
-  directory = "netlify/functions"
+  # The single '/' at the beginning tells Netlify to look for this folder
+  # at the absolute root of the project, ignoring the 'base' directory.
+  directory = "/netlify/functions"
