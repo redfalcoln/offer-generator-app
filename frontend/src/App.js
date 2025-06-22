@@ -32,7 +32,7 @@ const App = () => {
 
         try {
             // This is the new, simplified URL.
-            const response = await fetch('/.netlify/functions/generate', {
+            const response = await fetch('https://YOUR_DIGITALOCEAN_URL_GOES_HERE/api/generate-niche-titles', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ niche_category: selectedNiche }),
