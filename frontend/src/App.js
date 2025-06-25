@@ -1,9 +1,8 @@
-// FINAL code for frontend/src/App.js
+// FINAL code for frontend/src/App.js for the complete 11-step offer builder
 
 import React, { useState } from 'react';
 import './App.css';
 
-// The full, corrected list of 12 niche options
 const nicheOptions = [
   "💵 Wealth > Making Money",
   "💵 Wealth > Growing money",
@@ -20,28 +19,37 @@ const nicheOptions = [
 ];
 
 const App = () => {
-    const [selectedNiche, setSelectedNiche] = useState(nicheOptions[0]);
-    const [result, setResult] = useState('');
+    const [currentStep, setCurrentStep] = useState(1);
+    const [formData, setFormData] = useState({ niche_category: nicheOptions[1] });
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const handleSubmit = async (e) => {
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleNextStep = (e) => {
+        e.preventDefault();
+        setCurrentStep(prev => prev + 1);
+    };
+
+    const handleApiSubmit = async (e, stepName, data) => {
         e.preventDefault();
         setIsLoading(true);
         setError('');
-        setResult('');
-
+        
         try {
             const response = await fetch('/.netlify/functions/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ niche_category: selectedNiche }),
+                body: JSON.stringify({ stepName, data }),
             });
-            const data = await response.json();
-            if (data.error) throw new Error(data.error);
+            const result = await response.json();
+            if (result.error) throw new Error(result.error);
             
-            // The frontend receives and displays the FINAL result of the 2-step chain
-            setResult(data.response);
+            setFormData(prev => ({ ...prev, [stepName]: result.response }));
+            setCurrentStep(prev => prev + 1);
 
         } catch (err) {
             setError(err.message);
@@ -49,37 +57,142 @@ const App = () => {
             setIsLoading(false);
         }
     };
+    
+    const renderResult = (name, title) => {
+        return formData[name] && (
+            <div className="summary-item">
+                <h4>{title}</h4>
+                <pre>{formData[name]}</pre>
+            </div>
+        );
+    };
+
+    const renderInput = (name, title) => {
+        return formData[name] && (
+             <div className="summary-item">
+                <h4>{title}</h4>
+                <p>{formData[name]}</p>
+            </div>
+        );
+    }
 
     return (
         <div className="App">
             <div className="container">
                 <h1>Create Your Offer</h1>
-                
-                <div className="step-container">
-                  <h2>Step 1: Niche</h2>
-                  <form onSubmit={handleSubmit}>
-                      <p>Select your Niche from the list below. This will run a 2-step process to generate detailed client avatars.</p>
-                      <select value={selectedNiche} onChange={(e) => setSelectedNiche(e.target.value)}>
-                          {nicheOptions.map(option => (
-                              <option key={option} value={option}>{option}</option>
-                          ))}
-                      </select>
-                      <button type="submit" disabled={isLoading}>
-                          {isLoading ? 'Generating...' : 'Generate Client Avatars'}
-                      </button>
-                  </form>
+                <div className="progress-bar">
+                    <div className="progress" style={{ width: `${(currentStep -1) / 11 * 100}%` }}></div>
                 </div>
 
-                {/* This section will display the final AI-generated Avatars */}
-                <div className="step-container">
-                    <h2>Step 2: Avatar</h2>
-                    <p>The AI-generated Client Avatars for your selected niche will appear below.</p>
-                    <div className="result-box">
-                        {isLoading && <p className="loading-text">Generating, please wait... (This may take a moment as we are running two AI prompts)</p>}
-                        {error && <div className="error">{error}</div>}
-                        {result && <pre>{result}</pre>}
-                    </div>
+                <div className="summary-container">
+                    <h3>Your Offer So Far...</h3>
+                    {renderInput('niche_category', 'Niche Category')}
+                    {renderResult('niche', 'Generated Niches')}
+                    {renderResult('avatar', 'Generated Avatars')}
+                    {renderInput('outcome_input', 'Desired Outcome')}
+                    {renderResult('outcome', 'Generated Outcomes')}
+                    {renderInput('method_input', 'Method Details')}
+                    {renderResult('method', 'Generated Methods')}
+                    {renderInput('objections_input', 'Your Objections')}
+                    {renderResult('objections', 'Generated Objection Handling')}
+                    {renderResult('inclusions', 'Generated Value Stacks')}
+                    {renderInput('guarantee_input', 'Guarantee Details')}
+                    {renderResult('guarantee', 'Generated Guarantees')}
+                    {renderInput('offer_type', 'Offer Type')}
+                    {renderInput('payment_type', 'Payment Type')}
+                    {renderResult('price', 'Generated Pricing')}
+                    {renderResult('name', 'Generated Names')}
                 </div>
+                
+                <div className="step-container">
+                    {currentStep === 1 && (
+                        <form onSubmit={(e) => handleApiSubmit(e, 'niche', { niche_category: formData.niche_category })}>
+                            <h2>Step 1: Niche</h2>
+                            <p>Select your Niche Category to generate specific titles.</p>
+                            <select name="niche_category" value={formData.niche_category} onChange={handleInputChange}>
+                                {nicheOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                            </select>
+                            <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Generate Niche Titles'}</button>
+                        </form>
+                    )}
+                    {currentStep === 2 && (
+                        <form onSubmit={(e) => handleApiSubmit(e, 'avatar', { niche_category: formData.niche_category, niche_titles: formData.niche })}>
+                             <h2>Step 2: Avatar</h2>
+                             <p>Now, let's generate some ideal client avatars for the niches you just created.</p>
+                             <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Generate Avatars'}</button>
+                        </form>
+                    )}
+                    {currentStep === 3 && (
+                        <form onSubmit={(e) => handleApiSubmit(e, 'outcome', { niche_category: formData.niche_category, niche_titles: formData.niche })}>
+                            <h2>Step 3: Outcome</h2>
+                            <p>Let's define some powerful, desirable outcomes for your offer.</p>
+                             <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Generate Outcomes'}</button>
+                        </form>
+                    )}
+                    {currentStep === 4 && (
+                        <form onSubmit={(e) => handleApiSubmit(e, 'method', { niche_category: formData.niche_category, niche_titles: formData.niche, primary_outcome: formData.outcome })}>
+                             <h2>Step 4: Method</h2>
+                             <p>Now, let's develop a unique method for delivering the outcome.</p>
+                             <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Generate Method Ideas'}</button>
+                        </form>
+                    )}
+                    {currentStep === 5 && (
+                        <form onSubmit={(e) => handleApiSubmit(e, 'objections', { niche_category: formData.niche_category, niche_titles: formData.niche, avatar_details: formData.avatar, primary_outcome: formData.outcome })}>
+                             <h2>Step 5: Objections</h2>
+                             <p>Let's anticipate and solve potential customer objections.</p>
+                             <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Analyze Objections'}</button>
+                        </form>
+                    )}
+                    {currentStep === 6 && (
+                        <form onSubmit={(e) => handleApiSubmit(e, 'inclusions', {})}>
+                             <h2>Step 6: Inclusions</h2>
+                             <p>Now, let's build some high-value stacks for your offer.</p>
+                             <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Build Value Stacks'}</button>
+                        </form>
+                    )}
+                    {currentStep === 7 && (
+                        <form onSubmit={(e) => handleApiSubmit(e, 'guarantee', { niche_category: formData.niche_category, niche_titles: formData.niche, avatar_details: formData.avatar, primary_outcome: formData.outcome, objections: formData.objections })}>
+                             <h2>Step 7: Guarantee</h2>
+                             <p>Let's create a powerful guarantee to reduce risk and boost conversions.</p>
+                             <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Create Guarantee'}</button>
+                        </form>
+                    )}
+                     {currentStep === 8 && (
+                        <form onSubmit={handleNextStep}>
+                            <h2>Step 8: Offer & Payment Type</h2>
+                            <p>Define the delivery format and payment structure for your offer.</p>
+                            <div className="final-inputs">
+                                <label>Offer Type (e.g., Bootcamp, Course, Workshop)</label>
+                                <input name="offer_type" onChange={handleInputChange} type="text" required />
+                                <label>Payment Type (e.g., One-time payment, Subscription)</label>
+                                <input name="payment_type" onChange={handleInputChange} type="text" required />
+                            </div>
+                            <button type="submit">Next Step</button>
+                        </form>
+                    )}
+                     {currentStep === 9 && (
+                        <form onSubmit={(e) => handleApiSubmit(e, 'price', { stack_value: 10000, offer_type: formData.offer_type, primary_outcome: formData.outcome, avatar_details: formData.avatar, method_details: formData.method })}>
+                             <h2>Step 9: Price</h2>
+                             <p>Now let's generate some strategic pricing options for your offer.</p>
+                             <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Suggest Pricing'}</button>
+                        </form>
+                    )}
+                     {currentStep === 10 && (
+                        <form onSubmit={(e) => handleApiSubmit(e, 'name', { offer_type: formData.offer_type, niche_titles: formData.niche, primary_outcome: formData.outcome, method_details: formData.method, guarantee_details: formData.guarantee })}>
+                             <h2>Step 10: Name</h2>
+                             <p>Finally, let's give your amazing offer a compelling name.</p>
+                             <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Generate Names'}</button>
+                        </form>
+                    )}
+                    {currentStep === 11 && (
+                        <div>
+                            <h2>🎉 Offer Complete! 🎉</h2>
+                            <p>You have successfully built your entire offer from scratch. Review the details in the summary box above.</p>
+                            <button onClick={() => { setCurrentStep(1); setFormData({niche_category: nicheOptions[1]}); }}>Start a New Offer</button>
+                        </div>
+                    )}
+                </div>
+                {error && <div className="error">{error}</div>}
             </div>
         </div>
     );
