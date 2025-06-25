@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import './App.css';
 
+// The full, corrected list of 12 niche options
 const nicheOptions = [
   "💵 Wealth > Making Money",
   "💵 Wealth > Growing money",
@@ -31,8 +32,7 @@ const App = () => {
         setResult('');
 
         try {
-            // This is the new, simplified URL.
-            const response = await fetch('https://coral-app-rbtwz.ondigitalocean.app/api/generate-niche-titles', {
+            const response = await fetch('/.netlify/functions/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ niche_category: selectedNiche }),
@@ -40,6 +40,7 @@ const App = () => {
             const data = await response.json();
             if (data.error) throw new Error(data.error);
             
+            // The frontend receives and displays the FINAL result of the 2-step chain
             setResult(data.response);
 
         } catch (err) {
@@ -53,25 +54,28 @@ const App = () => {
         <div className="App">
             <div className="container">
                 <h1>Create Your Offer</h1>
+                
                 <div className="step-container">
                   <h2>Step 1: Niche</h2>
                   <form onSubmit={handleSubmit}>
-                      <p>Select your Niche from the list below. This will use the corresponding prompt to generate titles.</p>
+                      <p>Select your Niche from the list below. This will run a 2-step process to generate detailed client avatars.</p>
                       <select value={selectedNiche} onChange={(e) => setSelectedNiche(e.target.value)}>
                           {nicheOptions.map(option => (
                               <option key={option} value={option}>{option}</option>
                           ))}
                       </select>
                       <button type="submit" disabled={isLoading}>
-                          {isLoading ? 'Generating...' : 'Generate Niche Titles'}
+                          {isLoading ? 'Generating...' : 'Generate Client Avatars'}
                       </button>
                   </form>
                 </div>
+
+                {/* This section will display the final AI-generated Avatars */}
                 <div className="step-container">
                     <h2>Step 2: Avatar</h2>
-                    <p>The AI-generated Niche Titles will appear below. You can then define your Avatar based on these ideas.</p>
+                    <p>The AI-generated Client Avatars for your selected niche will appear below.</p>
                     <div className="result-box">
-                        {isLoading && <p className="loading-text">Generating, please wait...</p>}
+                        {isLoading && <p className="loading-text">Generating, please wait... (This may take a moment as we are running two AI prompts)</p>}
                         {error && <div className="error">{error}</div>}
                         {result && <pre>{result}</pre>}
                     </div>
