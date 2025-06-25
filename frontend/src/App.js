@@ -40,7 +40,8 @@ const App = () => {
         setError('');
         
         try {
-            const response = await fetch('/.netlify/functions/generate', {
+            const backendApiUrl = 'https://https://coral-app-rbtwz.ondigitalocean.app'
+            const response = await fetch(`${backendApiUrl}/api/generate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ stepName, data }),
