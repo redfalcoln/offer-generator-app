@@ -22,7 +22,6 @@ const nicheOptions = [
 // IMPORTANT: This URL has been corrected to remove the extra "https://"
 // Please replace 'your-backend-component-name' with the actual name from your DO dashboard
 // #############################################################################
-const BACKEND_URL = 'https://coral-app-rbtwz.ondigitalocean.app';
 
 
 const App = () => {
@@ -43,7 +42,7 @@ const App = () => {
         
         try {
             // This now calls your dedicated backend service with the correct path
-            const response = await fetch(`${BACKEND_URL}/api/generate`, {
+            const response = await fetch(`https://coral-app-rbtwz.ondigitalocean.app/api/generate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ stepName, data }),
