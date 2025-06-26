@@ -22,7 +22,7 @@ const nicheOptions = [
 // #############################################################################
 // IMPORTANT: REPLACE THE PLACEHOLDER URL BELOW WITH YOUR REAL BACKEND URL
 // #############################################################################
-const BACKEND_URL = 'https://your-backend-url-from-digitalocean.ondigitalocean.app';
+const BACKEND_URL = 'https://coral-app-rbtwz.ondigitalocean.app';
 
 
 const App = () => {
@@ -48,7 +48,6 @@ const App = () => {
         
         try {
             // This now calls your dedicated backend service with the correct path
-            const BACKEND_URL = 'https://coral-app-rbtwz.ondigitalocean.app'
             const response = await fetch(`${BACKEND_URL}/api/generate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
