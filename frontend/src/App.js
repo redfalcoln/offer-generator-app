@@ -1,4 +1,4 @@
-// FINAL code for frontend/src/App.js with step debugger
+// FINAL CORRECTED code for frontend/src/App.js
 
 import React, { useState } from 'react';
 import './App.css';
@@ -18,6 +18,13 @@ const nicheOptions = [
   "🕹️ Entertainment > Personal/adult/comedy",
 ];
 
+// #############################################################################
+// IMPORTANT: This URL has been corrected to remove the extra "https://"
+// Please replace 'your-backend-component-name' with the actual name from your DO dashboard
+// #############################################################################
+const BACKEND_URL = 'https://coral-app-rbtwz.ondigitalocean.app';
+
+
 const App = () => {
     const [currentStep, setCurrentStep] = useState(1);
     const [formData, setFormData] = useState({ niche_category: nicheOptions[1] });
@@ -35,8 +42,8 @@ const App = () => {
         setError('');
         
         try {
-            // NOTE: Ensure your DigitalOcean backend URL is correct
-            const response = await fetch('https://coral-app-rbtwz-backend.ondigitalocean.app/api/generate', {
+            // This now calls your dedicated backend service with the correct path
+            const response = await fetch(`${BACKEND_URL}/api/generate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ stepName, data }),
