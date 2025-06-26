@@ -1,9 +1,8 @@
-// FINAL CORRECTED code for frontend/src/App.js for DIGITALOCEAN
+// FINAL code for frontend/src/App.js with step debugger
 
 import React, { useState } from 'react';
 import './App.css';
 
-// This is the full list of 12 niche options
 const nicheOptions = [
   "💵 Wealth > Making Money",
   "💵 Wealth > Growing money",
@@ -19,12 +18,6 @@ const nicheOptions = [
   "🕹️ Entertainment > Personal/adult/comedy",
 ];
 
-// #############################################################################
-// IMPORTANT: REPLACE THE PLACEHOLDER URL BELOW WITH YOUR REAL BACKEND URL
-// #############################################################################
-const BACKEND_URL = 'https://coral-app-rbtwz.ondigitalocean.app';
-
-
 const App = () => {
     const [currentStep, setCurrentStep] = useState(1);
     const [formData, setFormData] = useState({ niche_category: nicheOptions[1] });
@@ -36,19 +29,14 @@ const App = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleNextStep = (e) => {
-        e.preventDefault();
-        setCurrentStep(prev => prev + 1);
-    };
-
     const handleApiSubmit = async (e, stepName, data) => {
         e.preventDefault();
         setIsLoading(true);
         setError('');
         
         try {
-            // This now calls your dedicated backend service with the correct path
-            const response = await fetch(`${BACKEND_URL}/api/generate`, {
+            // NOTE: Ensure your DigitalOcean backend URL is correct
+            const response = await fetch('https://coral-app-rbtwz-backend.ondigitalocean.app/api/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ stepName, data }),
@@ -86,14 +74,18 @@ const App = () => {
         );
     }
 
-    // The rest of your JSX from the previous correct version goes here...
-    // This is the full UI for your 11-step process.
     return (
         <div className="App">
             <div className="container">
                 <h1>Create Your Offer</h1>
+
+                {/* --- THIS IS THE NEW DEBUGGER BOX --- */}
+                <div className="debugger">
+                  <p>DEBUGGER: The current step is {currentStep}</p>
+                </div>
+
                 <div className="progress-bar">
-                    <div className="progress" style={{ width: `${(currentStep -1) / 11 * 100}%` }}></div>
+                    <div className="progress" style={{ width: `${(currentStep -1) / 10 * 100}%` }}></div>
                 </div>
 
                 <div className="summary-container">
@@ -101,14 +93,10 @@ const App = () => {
                     {renderInput('niche_category', 'Niche Category')}
                     {renderResult('niche', 'Generated Niches')}
                     {renderResult('avatar', 'Generated Avatars')}
-                    {renderInput('outcome_input', 'Desired Outcome')}
                     {renderResult('outcome', 'Generated Outcomes')}
-                    {renderInput('method_input', 'Method Details')}
                     {renderResult('method', 'Generated Methods')}
-                    {renderInput('objections_input', 'Your Objections')}
                     {renderResult('objections', 'Generated Objection Handling')}
                     {renderResult('inclusions', 'Generated Value Stacks')}
-                    {renderInput('guarantee_input', 'Guarantee Details')}
                     {renderResult('guarantee', 'Generated Guarantees')}
                     {renderInput('offer_type', 'Offer Type')}
                     {renderInput('payment_type', 'Payment Type')}
@@ -117,7 +105,6 @@ const App = () => {
                 </div>
                 
                 <div className="step-container">
-                    {/* All 11 steps of your UI logic are here */}
                     {currentStep === 1 && (
                         <form onSubmit={(e) => handleApiSubmit(e, 'niche', { niche_category: formData.niche_category })}>
                             <h2>Step 1: Niche</h2>
@@ -128,14 +115,75 @@ const App = () => {
                             <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Generate Niche Titles'}</button>
                         </form>
                     )}
-                     {currentStep === 2 && (
+                    {currentStep === 2 && (
                         <form onSubmit={(e) => handleApiSubmit(e, 'avatar', { niche_category: formData.niche_category, niche_titles: formData.niche })}>
                              <h2>Step 2: Avatar</h2>
                              <p>Now, let's generate some ideal client avatars for the niches you just created.</p>
                              <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Generate Avatars'}</button>
                         </form>
                     )}
-                    {/* ... other steps 3 through 10 ... */}
+                    {currentStep === 3 && (
+                        <form onSubmit={(e) => handleApiSubmit(e, 'outcome', { niche_category: formData.niche_category, niche_titles: formData.niche })}>
+                            <h2>Step 3: Outcome</h2>
+                            <p>Let's define some powerful, desirable outcomes for your offer.</p>
+                             <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Generate Outcomes'}</button>
+                        </form>
+                    )}
+                    {currentStep === 4 && (
+                        <form onSubmit={(e) => handleApiSubmit(e, 'method', { niche_category: formData.niche_category, niche_titles: formData.niche, primary_outcome: formData.outcome })}>
+                             <h2>Step 4: Method</h2>
+                             <p>Now, let's develop a unique method for delivering the outcome.</p>
+                             <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Generate Method Ideas'}</button>
+                        </form>
+                    )}
+                    {currentStep === 5 && (
+                        <form onSubmit={(e) => handleApiSubmit(e, 'objections', { niche_category: formData.niche_category, niche_titles: formData.niche, avatar_details: formData.avatar, primary_outcome: formData.outcome })}>
+                             <h2>Step 5: Objections</h2>
+                             <p>Let's anticipate and solve potential customer objections.</p>
+                             <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Analyze Objections'}</button>
+                        </form>
+                    )}
+                    {currentStep === 6 && (
+                        <form onSubmit={(e) => handleApiSubmit(e, 'inclusions', {})}>
+                             <h2>Step 6: Inclusions</h2>
+                             <p>Now, let's build some high-value stacks for your offer.</p>
+                             <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Build Value Stacks'}</button>
+                        </form>
+                    )}
+                    {currentStep === 7 && (
+                        <form onSubmit={(e) => handleApiSubmit(e, 'guarantee', { niche_category: formData.niche_category, niche_titles: formData.niche, avatar_details: formData.avatar, primary_outcome: formData.outcome, objections: formData.objections })}>
+                             <h2>Step 7: Guarantee</h2>
+                             <p>Let's create a powerful guarantee to reduce risk and boost conversions.</p>
+                             <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Create Guarantee'}</button>
+                        </form>
+                    )}
+                     {currentStep === 8 && (
+                        <form onSubmit={(e) => { e.preventDefault(); setCurrentStep(9); }}>
+                            <h2>Step 8: Offer & Payment Type</h2>
+                            <p>Define the delivery format and payment structure for your offer.</p>
+                            <div className="final-inputs">
+                                <label>Offer Type (e.g., Bootcamp, Course, Workshop)</label>
+                                <input name="offer_type" onChange={handleInputChange} type="text" required />
+                                <label>Payment Type (e.g., One-time payment, Subscription)</label>
+                                <input name="payment_type" onChange={handleInputChange} type="text" required />
+                            </div>
+                            <button type="submit">Next Step</button>
+                        </form>
+                    )}
+                     {currentStep === 9 && (
+                        <form onSubmit={(e) => handleApiSubmit(e, 'price', { stack_value: 10000, offer_type: formData.offer_type, primary_outcome: formData.outcome, avatar_details: formData.avatar, method_details: formData.method })}>
+                             <h2>Step 9: Price</h2>
+                             <p>Now let's generate some strategic pricing options for your offer.</p>
+                             <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Suggest Pricing'}</button>
+                        </form>
+                    )}
+                     {currentStep === 10 && (
+                        <form onSubmit={(e) => handleApiSubmit(e, 'name', { offer_type: formData.offer_type, niche_titles: formData.niche, primary_outcome: formData.outcome, method_details: formData.method, guarantee_details: formData.guarantee })}>
+                             <h2>Step 10: Name</h2>
+                             <p>Finally, let's give your amazing offer a compelling name.</p>
+                             <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Generate Names'}</button>
+                        </form>
+                    )}
                     {currentStep === 11 && (
                         <div>
                             <h2>🎉 Offer Complete! 🎉</h2>
@@ -149,6 +197,5 @@ const App = () => {
         </div>
     );
 };
-
 
 export default App;
