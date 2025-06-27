@@ -1,11 +1,11 @@
-// FINAL ENHANCED code for frontend/src/App.js
+// Complete, unabridged, and corrected code for frontend/src/App.js
 
 import React, { useState, useRef } from 'react';
 import './App.css';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-// --- UPDATED DATA FOR DROPDOWNS ---
+// --- DATA FOR DROPDOWNS ---
 const nicheOptions = [
   "💵 Wealth > Making Money", "💵 Wealth > Growing money", "💵 Wealth > Protecting & saving money",
   "💪 Health > Improving beauty & appearance", "💪 Health > Improving performance", "💪 Health > Reducing pain, discomfort & disease",
@@ -74,7 +74,6 @@ const App = () => {
         setCurrentStep(prev => prev + 1);
     };
 
-    // --- LOGIC FIX: The 'advanceStep' parameter fixes the Step 6 button ---
     const handleApiSubmit = async (e, stepName, data, advanceStep = true) => {
         e.preventDefault();
         setIsLoading(true);
@@ -91,7 +90,6 @@ const App = () => {
             }
             setFormData(prev => ({ ...prev, [stepName]: result.response }));
             
-            // Only advance to the next step if 'advanceStep' is true
             if (advanceStep) {
                 setCurrentStep(prev => prev + 1);
             }
@@ -168,14 +166,44 @@ const App = () => {
                 </div>
                 
                 <div className="step-container">
-                    {/* Steps 1-5 */}
-                    {currentStep === 1 && <form onSubmit={(e) => handleApiSubmit(e, 'niche', { niche_category: formData.niche_category })}><h2.../></form>}
-                    {currentStep === 2 && <form onSubmit={(e) => handleApiSubmit(e, 'avatar', { niche_category: formData.niche_category, niche_titles: formData.niche })}><h2.../></form>}
-                    {currentStep === 3 && <form onSubmit={(e) => handleApiSubmit(e, 'outcome', { niche_category: formData.niche_category, niche_titles: formData.niche })}><h2.../></form>}
-                    {currentStep === 4 && <form onSubmit={(e) => handleApiSubmit(e, 'method', { niche_category: formData.niche_category, niche_titles: formData.niche, primary_outcome: formData.outcome })}><h2.../></form>}
-                    {currentStep === 5 && <form onSubmit={(e) => handleApiSubmit(e, 'objections', { niche_category: formData.niche_category, niche_titles: formData.niche, avatar_details: formData.avatar, primary_outcome: formData.outcome })}><h2.../></form>}
-
-                    {/* Step 6 */}
+                    {currentStep === 1 && (
+                        <form onSubmit={(e) => handleApiSubmit(e, 'niche', { niche_category: formData.niche_category })}>
+                            <h2>Step 1: Niche</h2>
+                            <p>Select your Niche Category to generate specific titles.</p>
+                            <select name="niche_category" value={formData.niche_category} onChange={handleInputChange}>
+                                {nicheOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                            </select>
+                            <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Generate Niche Titles'}</button>
+                        </form>
+                    )}
+                    {currentStep === 2 && (
+                        <form onSubmit={(e) => handleApiSubmit(e, 'avatar', { niche_category: formData.niche_category, niche_titles: formData.niche })}>
+                             <h2>Step 2: Avatar</h2>
+                             <p>Now, let's generate some ideal client avatars for the niches you just created.</p>
+                             <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Generate Avatars'}</button>
+                        </form>
+                    )}
+                    {currentStep === 3 && (
+                        <form onSubmit={(e) => handleApiSubmit(e, 'outcome', { niche_category: formData.niche_category, niche_titles: formData.niche })}>
+                            <h2>Step 3: Outcome</h2>
+                            <p>Let's define some powerful, desirable outcomes for your offer.</p>
+                             <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Generate Outcomes'}</button>
+                        </form>
+                    )}
+                    {currentStep === 4 && (
+                        <form onSubmit={(e) => handleApiSubmit(e, 'method', { niche_category: formData.niche_category, niche_titles: formData.niche, primary_outcome: formData.outcome })}>
+                             <h2>Step 4: Method</h2>
+                             <p>Now, let's develop a unique method for delivering the outcome.</p>
+                             <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Generate Method Ideas'}</button>
+                        </form>
+                    )}
+                    {currentStep === 5 && (
+                        <form onSubmit={(e) => handleApiSubmit(e, 'objections', { niche_category: formData.niche_category, niche_titles: formData.niche, avatar_details: formData.avatar, primary_outcome: formData.outcome })}>
+                             <h2>Step 5: Objections</h2>
+                             <p>Let's anticipate and solve potential customer objections.</p>
+                             <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Analyze Objections'}</button>
+                        </form>
+                    )}
                     {currentStep === 6 && (
                         <form onSubmit={handleNextStep}>
                             <h2>Step 6: Inclusions & Bonuses</h2>
@@ -186,13 +214,11 @@ const App = () => {
                                 <div className="form-group"><label>Inclusion #3 Type</label><select name="inclusion3_type" value={formData.inclusion3_type} onChange={handleInputChange}>{inclusionOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}</select></div>
                                 <div className="form-group"><label>Conditional Bonus Type</label><select name="conditional_bonus_type" value={formData.conditional_bonus_type} onChange={handleInputChange}>{inclusionOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}</select></div>
                             </div>
-                            {/* LOGIC FIX: This button now calls handleApiSubmit with 'advanceStep' set to false */}
                             <button className="secondary" type="button" disabled={isLoading} onClick={(e) => handleApiSubmit(e, 'inclusions', {}, false)}>{isLoading ? 'Generating...' : 'Generate AI Value Stacks'}</button>
                             <button type="submit">Next Step</button>
                         </form>
                     )}
                     
-                    {/* Step 7 */}
                     {currentStep === 7 && (
                         <form onSubmit={handleNextStep}>
                             <h2>Step 7: Scarcity & Urgency</h2>
@@ -205,8 +231,13 @@ const App = () => {
                         </form>
                     )}
 
-                    {/* Steps 8-11 */}
-                    {currentStep === 8 && <form onSubmit={(e) => handleApiSubmit(e, 'guarantee', { ...formData })}><h2.../></form>}
+                    {currentStep === 8 && (
+                        <form onSubmit={(e) => handleApiSubmit(e, 'guarantee', { ...formData })}>
+                             <h2>Step 8: Guarantee</h2>
+                             <p>Let's create a powerful guarantee to reduce risk and boost conversions.</p>
+                             <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Create Guarantee'}</button>
+                        </form>
+                    )}
                     {currentStep === 9 && (
                         <form onSubmit={handleNextStep}>
                             <h2>Step 9: Offer & Payment Type</h2>
@@ -218,10 +249,23 @@ const App = () => {
                             <button type="submit">Next Step</button>
                         </form>
                     )}
-                    {currentStep === 10 && <form onSubmit={(e) => handleApiSubmit(e, 'price', { ...formData })}><h2.../></form>}
-                    {currentStep === 11 && <form onSubmit={(e) => handleApiSubmit(e, 'name', { ...formData })}><h2.../></form>}
                     
-                    {/* Step 12 - Completion */}
+                    {currentStep === 10 && (
+                        <form onSubmit={(e) => handleApiSubmit(e, 'price', { ...formData })}>
+                             <h2>Step 10: Price</h2>
+                             <p>Let's generate strategic pricing options to meet your revenue goals.</p>
+                             <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Suggest Pricing'}</button>
+                        </form>
+                    )}
+                    
+                    {currentStep === 11 && (
+                        <form onSubmit={(e) => handleApiSubmit(e, 'name', { ...formData })}>
+                             <h2>Step 11: Name</h2>
+                             <p>Finally, let's give your amazing offer a compelling name.</p>
+                             <button type="submit" disabled={isLoading}>{isLoading ? 'Generating...' : 'Generate Names'}</button>
+                        </form>
+                    )}
+                    
                     {currentStep === 12 && (
                         <div>
                             <h2>🎉 Offer Complete! 🎉</h2>
