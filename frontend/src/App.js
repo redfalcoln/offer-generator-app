@@ -1,11 +1,11 @@
-// Complete, unabridged code for frontend/src/App.js
+// FINAL ENHANCED code for frontend/src/App.js
 
 import React, { useState, useRef } from 'react';
 import './App.css';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-// --- DATA FOR NEW DROPDOWNS ---
+// --- DATA FOR DROPDOWNS ---
 const nicheOptions = [
   "💵 Wealth > Making Money", "💵 Wealth > Growing money", "💵 Wealth > Protecting & saving money",
   "💪 Health > Improving beauty & appearance", "💪 Health > Improving performance", "💪 Health > Reducing pain, discomfort & disease",
@@ -27,20 +27,23 @@ const urgencyOptions = ["Discount ends in...", "Price increases after...", "Offe
 const offerTypeOptions = ["Bootcamp", "Course", "Workshop", "Coaching Program", "Membership", "Service"];
 const paymentTypeOptions = ["One-time payment", "Subscription", "Payment Plan"];
 
+// --- Function to get the initial clean state ---
+const getInitialFormData = () => ({
+    niche_category: nicheOptions[1], // Default niche
+    inclusion1_type: inclusionOptions[0],
+    inclusion2_type: inclusionOptions[6],
+    inclusion3_type: inclusionOptions[15],
+    conditional_bonus_type: inclusionOptions[1],
+    scarcity: scarcityOptions[0],
+    urgency: urgencyOptions[0],
+    offer_type: offerTypeOptions[0],
+    payment_type: paymentTypeOptions[0]
+});
+
 
 const App = () => {
     const [currentStep, setCurrentStep] = useState(1);
-    const [formData, setFormData] = useState({ 
-        niche_category: nicheOptions[1],
-        inclusion1_type: inclusionOptions[0],
-        inclusion2_type: inclusionOptions[6],
-        inclusion3_type: inclusionOptions[15],
-        conditional_bonus_type: inclusionOptions[1],
-        scarcity: scarcityOptions[0],
-        urgency: urgencyOptions[0],
-        offer_type: offerTypeOptions[0],
-        payment_type: paymentTypeOptions[0]
-    });
+    const [formData, setFormData] = useState(getInitialFormData()); // Use the function for a clean start
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const reportRef = useRef();
@@ -48,6 +51,11 @@ const App = () => {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+    
+    const handleNextStep = (e) => {
+        e.preventDefault();
+        setCurrentStep(prev => prev + 1);
     };
 
     const handleApiSubmit = async (e, stepName, data) => {
@@ -85,7 +93,6 @@ const App = () => {
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF('p', 'mm', 'a4');
             const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = pdf.internal.pageSize.getHeight();
             const canvasWidth = canvas.width;
             const canvasHeight = canvas.height;
             const ratio = canvasWidth / canvasHeight;
@@ -94,13 +101,13 @@ const App = () => {
             let position = 0;
 
             pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
-            heightLeft -= pdfHeight;
+            heightLeft -= pdf.internal.pageSize.getHeight();
 
             while (heightLeft > 0) {
                 position = heightLeft - imgHeight;
                 pdf.addPage();
                 pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
-                heightLeft -= pdfHeight;
+                heightLeft -= pdf.internal.pageSize.getHeight();
             }
             pdf.save("Your-Offer-Report.pdf");
         });
@@ -184,7 +191,7 @@ const App = () => {
                         </form>
                     )}
                     {currentStep === 6 && (
-                        <form onSubmit={(e) => { e.preventDefault(); setCurrentStep(7); }}>
+                        <form onSubmit={handleNextStep}>
                             <h2>Step 6: Inclusions & Bonuses</h2>
                             <p>Manually select your core offer inclusions, then generate AI suggestions for value stacks.</p>
                             <div className="form-grid">
@@ -199,7 +206,7 @@ const App = () => {
                     )}
                     
                     {currentStep === 7 && (
-                        <form onSubmit={(e) => { e.preventDefault(); setCurrentStep(8); }}>
+                        <form onSubmit={handleNextStep}>
                             <h2>Step 7: Scarcity & Urgency</h2>
                             <p>Select psychological triggers to encourage prompt action.</p>
                              <div className="form-grid">
@@ -219,7 +226,7 @@ const App = () => {
                     )}
 
                     {currentStep === 9 && (
-                        <form onSubmit={(e) => { e.preventDefault(); setCurrentStep(10); }}>
+                        <form onSubmit={handleNextStep}>
                             <h2>Step 9: Offer & Payment Type</h2>
                             <p>Define the delivery format and payment structure for your offer.</p>
                              <div className="form-grid">
@@ -251,7 +258,7 @@ const App = () => {
                             <h2>🎉 Offer Complete! 🎉</h2>
                             <p>You have successfully built your entire offer from scratch. Review the details in the summary box above and download your report.</p>
                             <button onClick={generatePdf}>Download PDF Report</button>
-                            <button className="secondary" onClick={() => { setCurrentStep(1); setFormData({niche_category: nicheOptions[1]}); }}>Start a New Offer</button>
+                            <button className="secondary" onClick={() => { setCurrentStep(1); setFormData(getInitialFormData()); }}>Start a New Offer</button>
                         </div>
                     )}
                 </div>
